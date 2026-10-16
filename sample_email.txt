@@ -1,0 +1,7 @@
+Subject: Daily update - Western cluster
+
+Hi team, today's status:
+SITE-1003 | New 5G install | Done | visits 3/3 | TL Saad | Western | Operator B
+SITE-1007 | Battery replacement | Done | visits 1/1 | TL Saad | Western | Operator B
+
+Regards

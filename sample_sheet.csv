@@ -1,0 +1,7 @@
+Date,Site ID,Region,Scope,Activity,SLA Visits,Actual Visits,Status,Team Lead
+2026-10-15,SITE-1001,Central,Operator A,Antenna swap,2,2,Done,TL Hamza
+2026-10-15,SITE-1002,Central,Operator A,RF optimisation,1,2,Done,TL Hamza
+2026-10-15,SITE-1003,Western,Operator B,New 5G install,3,1,In Progress,TL Saad
+2026-10-15,SITE-1004,Western,Operator B,Power upgrade,2,2,Done,TL Saad
+2026-10-15,SITE-1005,Eastern,Operator C,Microwave link,2,1,Pending,TL Omar
+2026-10-15,SITE-1006,Eastern,Operator C,Site survey,1,1,Done,TL Omar

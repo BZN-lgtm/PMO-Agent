@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Site Progress Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root{--bg:#0f1720;--card:#16212c;--ink:#e6edf3;--mute:#8b9bab;--ok:#3fb950;--bad:#f85149;--acc:#58a6ff}
+  *{box-sizing:border-box}body{margin:0;font:14px/1.5 system-ui,sans-serif;background:var(--bg);color:var(--ink)}
+  main{max-width:1100px;margin:auto;padding:24px 16px}
+  h1{margin:0 0 4px;font-size:22px}.sub{color:var(--mute);margin-bottom:20px}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+  .card{background:var(--card);border-radius:10px;padding:16px}
+  .num{font-size:28px;font-weight:700}.lbl{color:var(--mute);font-size:12px;text-transform:uppercase}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+  @media(max-width:760px){.grid{grid-template-columns:1fr}}
+  table{width:100%;border-collapse:collapse;margin-top:12px}th,td{padding:8px;text-align:left;border-bottom:1px solid #253240}
+  th{color:var(--mute);font-weight:500}.breach{color:var(--bad);font-weight:600}
+  .tablewrap{overflow-x:auto}
+</style>
+</head>
+<body><main>
+  <h1>Mobile Network — Daily Site Progress</h1>
+  <div class="sub" id="date"></div>
+  <div class="kpis" id="kpis"></div>
+  <div class="card" style="margin-top:12px"><div class="lbl">AI brief</div><p id="brief"></p></div>
+  <div class="grid">
+    <div class="card"><div class="lbl">Sites by region</div><canvas id="region"></canvas></div>
+    <div class="card"><div class="lbl">Status mix</div><canvas id="status"></canvas></div>
+  </div>
+  <div class="card tablewrap" style="margin-top:12px"><div class="lbl">DPR</div><table id="tbl"></table></div>
+</main>
+<script>
+// Serve the repo root (python -m http.server) after running main.py --out output
+fetch('../output/dashboard_feed.json').then(r => r.json()).then(({summary: s, rows}) => {
+  document.getElementById('date').textContent = 'Report date: ' + s.date;
+  document.getElementById('brief').textContent = s.narrative;
+  const k = [['Sites reported', s.sites_reported], ['Completed', s.completed],
+             ['Completion', s.completion_pct + '%'], ['SLA breaches', s.sla_breaches]];
+  document.getElementById('kpis').innerHTML = k.map(([l, v]) =>
+    `<div class="card"><div class="lbl">${l}</div><div class="num">${v}</div></div>`).join('');
+  new Chart(region, {type: 'bar', data: {labels: Object.keys(s.by_region),
+    datasets: [{data: Object.values(s.by_region), backgroundColor: '#58a6ff'}]},
+    options: {plugins: {legend: {display: false}}}});
+  const st = rows.reduce((a, r) => (a[r.status] = (a[r.status] || 0) + 1, a), {});
+  new Chart(status, {type: 'doughnut', data: {labels: Object.keys(st),
+    datasets: [{data: Object.values(st), backgroundColor: ['#3fb950', '#d29922', '#8b9bab', '#58a6ff']}]}});
+  const cols = ['site_id', 'region', 'scope', 'activity', 'sla_visits', 'actual_visits', 'status', 'team_lead', 'source'];
+  tbl.innerHTML = '<tr>' + cols.map(c => `<th>${c.replace('_', ' ')}</th>`).join('') + '</tr>' +
+    rows.map(r => `<tr class="${r.sla_breach ? 'breach' : ''}">` +
+      cols.map(c => `<td>${r[c]}</td>`).join('') + '</tr>').join('');
+});
+</script>
+</body></html>
